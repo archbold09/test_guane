@@ -1,0 +1,9 @@
+@import '~bootstrap/dist/css/bootstrap.css';
+@import '~bootstrap-vue/dist/bootstrap-vue.css';
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import url('//cdn.materialdesignicons.com/5.4.55/css/materialdesignicons.min.css');
+body{
+    font-family: 'Space Mono', monospace;
+    color: #1F2937;
+    margin:60px 0px;
+}
