@@ -4,7 +4,7 @@
       <div class="col-6 my-2 text-center">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">
+            <h5 class="card-title font-weight-bold">
               <i class="mdi mdi-map-marker"></i> Pickup
             </h5>
             <div class="row">
@@ -31,7 +31,7 @@
       <div class="col-6 my-2 text-center">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">
+            <h5 class="card-title font-weight-bold">
               <i class="mdi mdi-map-marker"></i> Delivery
             </h5>
             <div class="row">
@@ -58,7 +58,7 @@
       <div class="col-12 text-center my-2">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">Accessorials</h5>
+            <h5 class="card-title font-weight-bold">Accessorials</h5>
             <div class="row">
               <div
                 v-for="(item, index) in accessorials"
@@ -80,6 +80,10 @@
       <div class="col-12 text-center">
         <div class="card">
           <div class="card-body">
+            <div class="row mb-4">
+              <button class="btn btn-outline-danger btn-sm">Delete</button>
+              <Modal :table-information="tableInformation"/>
+            </div>
             <table class="table table-hover">
               <thead>
                 <tr>
@@ -87,29 +91,25 @@
                   <th scope="col">Hu count</th>
                   <th scope="col">Dimensions</th>
                   <th scope="col">Weight</th>
-                  <th scope="col">Commodity</th>
                   <th scope="col">Stackable</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
+                <tr v-for="(item, index) in tableInformation" :key="index">
                   <th><input type="checkbox" /></th>
-                  <td>Mark</td>
-                  <td>Otto</td>
-                  <td>@mdo</td>
-                  <td>Otto</td>
-                  <td><input type="checkbox" /></td>
+                  <td>{{ item.hu_count }}</td>
+                  <td>{{ item.dimensions }}</td>
+                  <td>{{ item.weight }}</td>
+                  <td>
+                    <input
+                      :value="item.oversize"
+                      v-model="item.oversize"
+                      type="checkbox"
+                      disabled
+                    />
+                  </td>
                 </tr>
               </tbody>
-              <tfoot>
-                <tr>
-                  <th>Totals:</th>
-                  <td>1</td>
-                  <td>Units:</td>
-                  <td>65 cbf</td>
-                  <td>1lb</td>
-                </tr>
-              </tfoot>
             </table>
           </div>
         </div>
@@ -121,7 +121,12 @@
 <script>
 const axios = require("axios");
 const URL = `https://tt.guane.com.co/api/loads/1`;
+
+import Modal from "../components/Modal";
 export default {
+  components: {
+    Modal,
+  },
   data() {
     return {
       accessorials: [
@@ -139,18 +144,37 @@ export default {
       cityTo: "",
       zipFrom: "",
       zipTo: "",
+      tableInformation: [
+        {
+          hu_count: "2 Mackbook",
+          dimensions: "40.0 x 100.0",
+          weight: "3kl",
+          oversize: true,
+        },
+        {
+          hu_count: "1 Tv Smart",
+          dimensions: "1900.0 x 768.0",
+          weight: "10kl",
+          oversize: false,
+        },
+        {
+          hu_count: "10 Iphones 11 pro",
+          dimensions: "1378.0 x 768.0",
+          weight: "6kl",
+          oversize: true,
+        },
+      ],
     };
   },
   created: function() {
-    this.getData();
+    this.getAllData();
   },
   methods: {
-    async getData() {
-      axios
+    async getAllData() {
+      await axios
         .get(URL)
         .then((res) => res.data.hauls[0])
         .then((res) => {
-          // console.log(res)
           this.cityFrom = res.city_from;
           this.cityTo = res.city_to;
           this.zipFrom = res.zip_from;
@@ -158,11 +182,12 @@ export default {
           this.accessorials.filter((item) => {
             let resultFilter = item.name
               .toLowerCase()
-              .includes(res.accessorials[0].toLowerCase().replace("non-",""));
+              .includes(res.accessorials[0].toLowerCase().replace("non-", ""));
             if (resultFilter) {
               item.propertyValue = true;
             }
           });
+          res.commodity.map((item) => this.tableInformation.push(item));
         })
         .catch((error) => console.log(`Error:${error}`));
     },
