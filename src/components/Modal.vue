@@ -80,10 +80,9 @@
 <script>
 export default {
   name: "Modal",
-  props:['tableInformation'],
+  props: ["tableInformation"],
   data() {
     return {
-      localTable: this.tableInformation,
       product: {
         quantity: "",
         dimension: "",
@@ -99,12 +98,8 @@ export default {
       nameState: null,
     };
   },
-  created:function(){
-    console.log(this.localTable)
-  },
   methods: {
     checkFormValidity() {
-      
       const valid = this.$refs.form.checkValidity();
       this.nameState = valid;
       this.productState.quantity = valid;
@@ -135,7 +130,7 @@ export default {
         weight: this.product.weight,
         oversize: this.product.stackable,
       };
-       this.localTable.push(product)
+      this.tableInformation.push(product);
       this.$nextTick(() => {
         this.$bvModal.hide("modal-add");
       });

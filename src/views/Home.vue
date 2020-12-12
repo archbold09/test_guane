@@ -80,14 +80,26 @@
       <div class="col-12 text-center">
         <div class="card">
           <div class="card-body">
-            <div class="row mb-4">
-              <button class="btn btn-outline-danger btn-sm">Delete</button>
-              <Modal :table-information="tableInformation"/>
+            <div class="row ml-2 mb-4">
+              <button
+                class="btn btn-outline-danger btn-sm"
+                :disabled="
+                  checkboxProductSeleted.length == 0
+                    ? (disabledButton = true)
+                    : (disabledButton = false)
+                "
+                @click="deleteSelectedProduct"
+              >
+                Delete
+              </button>
+              <Modal :table-information="tableInformation" />
             </div>
             <table class="table table-hover">
               <thead>
                 <tr>
-                  <th scope="col"><input type="checkbox" /></th>
+                  <th scope="col">
+                    <input type="checkbox" v-model="selectAll" />
+                  </th>
                   <th scope="col">Hu count</th>
                   <th scope="col">Dimensions</th>
                   <th scope="col">Weight</th>
@@ -96,7 +108,13 @@
               </thead>
               <tbody>
                 <tr v-for="(item, index) in tableInformation" :key="index">
-                  <th><input type="checkbox" /></th>
+                  <th>
+                    <input
+                      type="checkbox"
+                      v-model="checkboxProductSeleted"
+                      :value="item.hu_count"
+                    />
+                  </th>
                   <td>{{ item.hu_count }}</td>
                   <td>{{ item.dimensions }}</td>
                   <td>{{ item.weight }}</td>
@@ -111,6 +129,7 @@
                 </tr>
               </tbody>
             </table>
+            <span>Selected: {{ checkboxProductSeleted }}</span>
           </div>
         </div>
       </div>
@@ -129,6 +148,8 @@ export default {
   },
   data() {
     return {
+      disabledButton: true,
+      checkboxProductSeleted: [],
       accessorials: [
         { propertyValue: false, name: "Hazmat" },
         { propertyValue: false, name: "Bonded" },
@@ -169,6 +190,25 @@ export default {
   created: function() {
     this.getAllData();
   },
+  computed: {
+    selectAll: {
+      get: function() {
+        return this.tableInformation
+          ? this.checkboxProductSeleted.length == this.tableInformation.length
+          : false;
+      },
+      set: function(value) {
+        let selected = [];
+
+        if (value) {
+          this.tableInformation.forEach((item) => {
+            selected.push(item.hu_count);
+          });
+        }
+        this.checkboxProductSeleted = selected;
+      },
+    },
+  },
   methods: {
     async getAllData() {
       await axios
@@ -190,6 +230,25 @@ export default {
           res.commodity.map((item) => this.tableInformation.push(item));
         })
         .catch((error) => console.log(`Error:${error}`));
+    },
+    deleteSelectedProduct() {
+      var array = [];
+      for (var i = 0; i < this.tableInformation.length; i++) {
+        var igual = false;
+        for (
+          var j = 0;
+          (j < this.checkboxProductSeleted.length) & !igual;
+          j++
+        ) {
+          if (
+            this.tableInformation[i]["hu_count"] ==
+            this.checkboxProductSeleted[j]
+          )
+            igual = true;
+        }
+        if (!igual) array.push(this.tableInformation[i]);
+      }
+      this.tableInformation = array;
     },
   },
 };
