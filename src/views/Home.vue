@@ -129,7 +129,6 @@
                 </tr>
               </tbody>
             </table>
-            <span>Selected: {{ checkboxProductSeleted }}</span>
           </div>
         </div>
       </div>
@@ -249,6 +248,7 @@ export default {
         if (!igual) array.push(this.tableInformation[i]);
       }
       this.tableInformation = array;
+      this.checkboxProductSeleted = [];
     },
   },
 };
